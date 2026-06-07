@@ -1,0 +1,18 @@
+name: Test Reusable
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-call:
+    uses: mochthebest-byte/ci-pipelines/.github/workflows/reusable-build.yml@main
+    with:
+      image_name: test
+      ecr_repository: my-app/vote
+      service_name: test
+      aws_region: us-east-1
+      ci_role_arn: arn:aws:iam::428156589409:role/my-app-eks-github-ci
+      gitops_repo: mochthebest-byte/gitops
+      docker_context: vote
+    secrets:
+      gitops_token: ${{ secrets.GITOPS_PAT }}
