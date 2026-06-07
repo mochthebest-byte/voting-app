@@ -17,6 +17,12 @@ on:
   pull_request:
     branches: [main]
 
+# ── Захист від race condition ──────────────────────
+# Якщо 2 pushes поспіль — зупиняємо попередній run
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ─── Крок 1: Перевірка коду ─────────────────────────
   test:
@@ -24,7 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "TODO: add lint/test steps here"
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          exit-code: 1
+          severity: HIGH,CRITICAL
 
   # ─── Крок 2: Build + Push ECR + GitOps ─────────────
   #      Викликає центральний reusable пайплайн
