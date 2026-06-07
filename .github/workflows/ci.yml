@@ -37,17 +37,17 @@ jobs:
       matrix:
         include:
           - service: vote
-            ecr_repo: voting-app-vote
+            ecr_repo: my-app/vote
             docker_context: vote
-            gitops_path: apps/vote/deployment.yaml
+            gitops_path: apps/vote/values.yaml
           - service: result
-            ecr_repo: voting-app-result
+            ecr_repo: my-app/result
             docker_context: result
-            gitops_path: apps/result/deployment.yaml
+            gitops_path: apps/result/values.yaml
           - service: worker
-            ecr_repo: voting-app-worker
+            ecr_repo: my-app/worker
             docker_context: worker
-            gitops_path: apps/worker/deployment.yaml
+            gitops_path: apps/worker/values.yaml
 
     uses: mochthebest-byte/ci-pipelines/.github/workflows/reusable-build.yml@main
     with:
