@@ -1,0 +1,10 @@
+name: Test Call Desc
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    uses: mochthebest-byte/ci-pipelines/.github/workflows/test-descriptions.yml@main
+    with:
+      name: "World"
