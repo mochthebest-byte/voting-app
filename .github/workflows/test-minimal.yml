@@ -1,0 +1,8 @@
+name: Test Minimal Reusable
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    uses: mochthebest-byte/test-reusable/.github/workflows/minimal-reusable.yml@main
