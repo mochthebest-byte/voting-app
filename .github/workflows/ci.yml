@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════════
+#  CI/CD — Build → ECR → GitOps (через OIDC, без ключів)
+# ═══════════════════════════════════════════════════════════════
+#  Що робить:
+#    1. Build Docker образу для vote, result, worker
+#    2. Push в Amazon ECR (тимчасові токени через OIDC)
+#    3. Оновлює GitOps-репозиторій (mochthebest-byte/gitops)
+#
+#  Не потребує AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+# ═══════════════════════════════════════════════════════════════
+
+name: CI — Build & Deploy to EKS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Крок 1: Перевірка коду ─────────────────────────
+  test:
+    name: "Code quality"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "TODO: add lint/test steps here"
+
+  # ─── Крок 2: Build + Push ECR + GitOps ─────────────
+  #      Викликає центральний reusable пайплайн
+  build-and-deploy:
+    name: "Build & deploy ${{ matrix.service }}"
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: vote
+            ecr_repo: voting-app-vote
+            docker_context: vote
+            gitops_path: apps/vote/deployment.yaml
+          - service: result
+            ecr_repo: voting-app-result
+            docker_context: result
+            gitops_path: apps/result/deployment.yaml
+          - service: worker
+            ecr_repo: voting-app-worker
+            docker_context: worker
+            gitops_path: apps/worker/deployment.yaml
+
+    uses: mochthebest-byte/ci-pipelines/.github/workflows/reusable-build.yml@main
+    with:
+      # ── Параметри сервісу ──────────────────────────
+      image_name: ${{ matrix.service }}
+      ecr_repository: ${{ matrix.ecr_repo }}
+      service_name: ${{ matrix.service }}
+      docker_context: ${{ matrix.docker_context }}
+
+      # ── AWS OIDC (безпарольна аутентифікація) ──────
+      aws_region: us-east-1
+      ci_role_arn: arn:aws:iam::428156589409:role/my-app-eks-github-ci
+
+      # ── GitOps ─────────────────────────────────────
+      gitops_repo: mochthebest-byte/gitops
+      gitops_branch: main
+      gitops_manifest_path: ${{ matrix.gitops_path }}
+
+    secrets:
+      gitops_token: ${{ secrets.GITOPS_PAT }}
