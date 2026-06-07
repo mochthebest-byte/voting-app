@@ -1,4 +1,4 @@
-name: Test With Inputs
+name: Test Fresh Reusable
 on:
   push:
     branches: [main]
