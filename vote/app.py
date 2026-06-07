@@ -1,3 +1,4 @@
+# voting-app — deployed via GitOps (ArgoCD + EKS)
 from flask import Flask, render_template, request, make_response, g
 from redis import Redis
 import os
