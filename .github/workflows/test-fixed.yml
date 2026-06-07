@@ -1,11 +1,11 @@
-name: Test E
+name: Test Fixed
 on:
   push:
     branches: [main]
 
 jobs:
   test:
-    uses: mochthebest-byte/ci-pipelines/.github/workflows/test-e.yml@main
+    uses: mochthebest-byte/ci-pipelines/.github/workflows/reusable-build.yml@main
     with:
       image_name: test
       ecr_repository: test
