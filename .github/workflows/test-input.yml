@@ -1,0 +1,10 @@
+name: Test Call With Input
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    uses: mochthebest-byte/ci-pipelines/.github/workflows/test-minimal.yml@main
+    with:
+      name: "World"
